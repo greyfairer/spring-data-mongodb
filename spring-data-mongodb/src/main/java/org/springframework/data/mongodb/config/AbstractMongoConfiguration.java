@@ -15,10 +15,7 @@
  */
 package org.springframework.data.mongodb.config;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-
+import com.mongodb.Mongo;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
@@ -28,6 +25,7 @@ import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.data.annotation.Persistent;
 import org.springframework.data.authentication.UserCredentials;
 import org.springframework.data.mapping.context.MappingContextIsNewStrategyFactory;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.data.mongodb.core.convert.CustomConversions;
@@ -40,7 +38,9 @@ import org.springframework.data.support.IsNewStrategyFactory;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.StringUtils;
 
-import com.mongodb.Mongo;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Base class for Spring Data MongoDB configuration using JavaConfig.
@@ -90,7 +90,7 @@ public abstract class AbstractMongoConfiguration {
 	@Bean
 	public SimpleMongoDbFactory mongoDbFactory() throws Exception {
 
-		UserCredentials credentials = getUserCredentials();
+		MongoDBUserCredentials credentials = getUserCredentials();
 
 		if (credentials == null) {
 			return new SimpleMongoDbFactory(mongo(), getDatabaseName());
@@ -118,7 +118,7 @@ public abstract class AbstractMongoConfiguration {
 	 * 
 	 * @return
 	 */
-	protected UserCredentials getUserCredentials() {
+	protected MongoDBUserCredentials getUserCredentials() {
 		return null;
 	}
 

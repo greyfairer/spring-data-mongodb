@@ -1,13 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <xsd:schema xmlns="http://www.springframework.org/schema/data/mongo"
-						xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-						xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-						xmlns:beans="http://www.springframework.org/schema/beans"
-						xmlns:tool="http://www.springframework.org/schema/tool"
-						xmlns:context="http://www.springframework.org/schema/context"
-						xmlns:repository="http://www.springframework.org/schema/data/repository"
-						targetNamespace="http://www.springframework.org/schema/data/mongo"
-						elementFormDefault="qualified" attributeFormDefault="unqualified">
+            xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns:beans="http://www.springframework.org/schema/beans"
+            xmlns:tool="http://www.springframework.org/schema/tool"
+            xmlns:repository="http://www.springframework.org/schema/data/repository"
+            targetNamespace="http://www.springframework.org/schema/data/mongo"
+            elementFormDefault="qualified" attributeFormDefault="unqualified">
 
 	<xsd:import namespace="http://www.springframework.org/schema/beans" />
 	<xsd:import namespace="http://www.springframework.org/schema/tool" />
@@ -84,6 +82,13 @@ The password to use when connecting to a MongoDB server.
 							]]></xsd:documentation>
 				</xsd:annotation>
 			</xsd:attribute>
+            <xsd:attribute name="authenticationDatabase" type="xsd:string" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation><![CDATA[
+The database to use when authenticating.
+							]]></xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
 			<xsd:attribute name="uri" type="xsd:string" use="optional">
 				<xsd:annotation>
 					<xsd:documentation><![CDATA[

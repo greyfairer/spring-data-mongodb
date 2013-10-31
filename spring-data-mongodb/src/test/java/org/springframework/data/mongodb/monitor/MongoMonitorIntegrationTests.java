@@ -15,11 +15,7 @@
  */
 package org.springframework.data.mongodb.monitor;
 
-import static org.hamcrest.Matchers.*;
-import static org.junit.Assert.*;
-
-import java.net.UnknownHostException;
-
+import com.mongodb.Mongo;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +24,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
 
-import com.mongodb.Mongo;
+import java.net.UnknownHostException;
+
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * This test class assumes that you are already running the MongoDB server.

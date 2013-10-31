@@ -19,7 +19,7 @@ import java.net.UnknownHostException;
 
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.dao.DataAccessException;
-import org.springframework.data.authentication.UserCredentials;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
 import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.util.Assert;
 
@@ -40,7 +40,7 @@ public class SimpleMongoDbFactory implements DisposableBean, MongoDbFactory {
 	private final Mongo mongo;
 	private final String databaseName;
 	private final boolean mongoInstanceCreated;
-	private final UserCredentials credentials;
+	private final MongoDBUserCredentials credentials;
 	private WriteConcern writeConcern;
 
 	/**
@@ -50,7 +50,7 @@ public class SimpleMongoDbFactory implements DisposableBean, MongoDbFactory {
 	 * @param databaseName database name, not be {@literal null} or empty.
 	 */
 	public SimpleMongoDbFactory(Mongo mongo, String databaseName) {
-		this(mongo, databaseName, UserCredentials.NO_CREDENTIALS, false);
+		this(mongo, databaseName, MongoDBUserCredentials.NO_CREDENTIALS, false);
 	}
 
 	/**
@@ -60,7 +60,7 @@ public class SimpleMongoDbFactory implements DisposableBean, MongoDbFactory {
 	 * @param databaseName Database name, must not be {@literal null} or empty.
 	 * @param credentials username and password.
 	 */
-	public SimpleMongoDbFactory(Mongo mongo, String databaseName, UserCredentials credentials) {
+	public SimpleMongoDbFactory(Mongo mongo, String databaseName, MongoDBUserCredentials credentials) {
 		this(mongo, databaseName, credentials, false);
 	}
 
@@ -73,10 +73,10 @@ public class SimpleMongoDbFactory implements DisposableBean, MongoDbFactory {
 	 * @see MongoURI
 	 */
 	public SimpleMongoDbFactory(MongoURI uri) throws MongoException, UnknownHostException {
-		this(new Mongo(uri), uri.getDatabase(), new UserCredentials(uri.getUsername(), parseChars(uri.getPassword())), true);
+		this(new Mongo(uri), uri.getDatabase(), new MongoDBUserCredentials(uri.getUsername(), parseChars(uri.getPassword())), true);
 	}
 
-	private SimpleMongoDbFactory(Mongo mongo, String databaseName, UserCredentials credentials,
+	private SimpleMongoDbFactory(Mongo mongo, String databaseName, MongoDBUserCredentials credentials,
 			boolean mongoInstanceCreated) {
 
 		Assert.notNull(mongo, "Mongo must not be null");
@@ -87,7 +87,7 @@ public class SimpleMongoDbFactory implements DisposableBean, MongoDbFactory {
 		this.mongo = mongo;
 		this.databaseName = databaseName;
 		this.mongoInstanceCreated = mongoInstanceCreated;
-		this.credentials = credentials == null ? UserCredentials.NO_CREDENTIALS : credentials;
+		this.credentials = credentials == null ? MongoDBUserCredentials.NO_CREDENTIALS : credentials;
 	}
 
 	/**

@@ -15,15 +15,14 @@
  */
 package org.springframework.data.mongodb.monitor;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.authentication.UserCredentials;
-import org.springframework.data.mongodb.core.MongoDbUtils;
-
 import com.mongodb.CommandResult;
 import com.mongodb.DB;
 import com.mongodb.Mongo;
 import com.mongodb.MongoException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
+import org.springframework.data.mongodb.core.MongoDbUtils;
 
 /**
  * Base class to encapsulate common configuration settings when connecting to a database
@@ -37,6 +36,7 @@ public abstract class AbstractMonitor {
 	protected Mongo mongo;
 	private String username;
 	private String password;
+    private String authenticationDatabase;
 
 	/**
 	 * Sets the username to use to connect to the Mongo database
@@ -56,7 +56,15 @@ public abstract class AbstractMonitor {
 		this.password = password;
 	}
 
-	public CommandResult getServerStatus() {
+    /**
+     * Sets the database to authenticate to.
+     * @param authenticationDatabase The authentication database name
+     */
+    public void setAuthenticationDatabase(String authenticationDatabase) {
+        this.authenticationDatabase = authenticationDatabase;
+    }
+
+    public CommandResult getServerStatus() {
 		CommandResult result = getDb("admin").command("serverStatus");
 		if (!result.ok()) {
 			logger.error("Could not query for server status.  Command Result = " + result);
@@ -66,6 +74,6 @@ public abstract class AbstractMonitor {
 	}
 
 	public DB getDb(String databaseName) {
-		return MongoDbUtils.getDB(mongo, databaseName, new UserCredentials(username, password));
+		return MongoDbUtils.getDB(mongo, databaseName, new MongoDBUserCredentials(username, password, authenticationDatabase));
 	}
 }

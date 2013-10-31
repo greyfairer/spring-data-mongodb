@@ -15,15 +15,15 @@
  */
 package org.springframework.data.mongodb.config;
 
-import static org.junit.Assert.*;
-import static org.springframework.test.util.ReflectionTestUtils.*;
-
+import com.mongodb.Mongo;
+import com.mongodb.MongoOptions;
+import com.mongodb.WriteConcern;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.data.authentication.UserCredentials;
 import org.springframework.data.mongodb.MongoDbFactory;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
 import org.springframework.data.mongodb.core.MongoFactoryBean;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.convert.MongoConverter;
@@ -31,9 +31,8 @@ import org.springframework.data.mongodb.gridfs.GridFsOperations;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoOptions;
-import com.mongodb.WriteConcern;
+import static org.junit.Assert.*;
+import static org.springframework.test.util.ReflectionTestUtils.getField;
 
 /**
  * Integration tests for the MongoDB namespace.
@@ -74,9 +73,23 @@ public class MongoNamespaceTests {
 		Mongo mongo = (Mongo) getField(dbf, "mongo");
 		assertEquals("localhost", mongo.getAddress().getHost());
 		assertEquals(27017, mongo.getAddress().getPort());
-		assertEquals(new UserCredentials("joe", "secret"), getField(dbf, "credentials"));
+		assertEquals(new MongoDBUserCredentials("joe", "secret"), getField(dbf, "credentials"));
 		assertEquals("database", getField(dbf, "databaseName"));
 	}
+
+    /**
+     * @see DATAMONGO-789
+     */
+    @Test
+    public void testThirdMongoDbFactory() {
+        assertTrue(ctx.containsBean("secondMongoDbFactory"));
+        MongoDbFactory dbf = (MongoDbFactory) ctx.getBean("secondMongoDbFactory");
+        Mongo mongo = (Mongo) getField(dbf, "mongo");
+        assertEquals("localhost", mongo.getAddress().getHost());
+        assertEquals(27017, mongo.getAddress().getPort());
+        assertEquals(new MongoDBUserCredentials("joe", "secret", "admin"), getField(dbf, "credentials"));
+        assertEquals("database", getField(dbf, "databaseName"));
+    }
 
 	/**
 	 * @see DATAMONGO-140

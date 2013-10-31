@@ -15,14 +15,14 @@
  */
 package org.springframework.data.mongodb.core.query;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-
+import com.mongodb.BasicDBObject;
+import com.mongodb.DBObject;
 import org.junit.Test;
 import org.springframework.data.mongodb.InvalidMongoDbApiUsageException;
 
-import com.mongodb.BasicDBObject;
-import com.mongodb.DBObject;
+import static org.hamcrest.CoreMatchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Oliver Gierke
