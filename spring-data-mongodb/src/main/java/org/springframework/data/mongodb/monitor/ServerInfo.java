@@ -15,14 +15,13 @@
  */
 package org.springframework.data.mongodb.monitor;
 
-import java.net.UnknownHostException;
-
+import com.mongodb.Mongo;
 import org.springframework.jmx.export.annotation.ManagedMetric;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.jmx.support.MetricType;
 
-import com.mongodb.Mongo;
+import java.net.UnknownHostException;
 
 /**
  * Expose basic server information via JMX

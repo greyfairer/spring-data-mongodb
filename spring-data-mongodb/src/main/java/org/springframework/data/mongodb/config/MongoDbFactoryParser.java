@@ -15,9 +15,8 @@
  */
 package org.springframework.data.mongodb.config;
 
-import static org.springframework.data.config.ParsingUtils.*;
-import static org.springframework.data.mongodb.config.MongoParsingUtils.*;
-
+import com.mongodb.Mongo;
+import com.mongodb.MongoURI;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.parsing.BeanComponentDefinition;
@@ -28,13 +27,15 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.data.authentication.UserCredentials;
 import org.springframework.data.config.BeanComponentDefinitionBuilder;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
 import org.springframework.data.mongodb.core.MongoFactoryBean;
 import org.springframework.data.mongodb.core.SimpleMongoDbFactory;
 import org.springframework.util.StringUtils;
 import org.w3c.dom.Element;
 
-import com.mongodb.Mongo;
-import com.mongodb.MongoURI;
+import static org.springframework.data.config.ParsingUtils.getSourceBeanDefinition;
+import static org.springframework.data.config.ParsingUtils.setPropertyValue;
+import static org.springframework.data.mongodb.config.MongoParsingUtils.getWriteConcernPropertyEditorBuilder;
 
 /**
  * {@link BeanDefinitionParser} to parse {@code db-factory} elements into {@link BeanDefinition}s.
@@ -135,14 +136,16 @@ public class MongoDbFactoryParser extends AbstractBeanDefinitionParser {
 
 		String username = element.getAttribute("username");
 		String password = element.getAttribute("password");
+        String authenticationDatabase = element.getAttribute("authenticationDatabase");
 
 		if (!StringUtils.hasText(username) && !StringUtils.hasText(password)) {
 			return null;
 		}
 
-		BeanDefinitionBuilder userCredentialsBuilder = BeanDefinitionBuilder.genericBeanDefinition(UserCredentials.class);
+		BeanDefinitionBuilder userCredentialsBuilder = BeanDefinitionBuilder.genericBeanDefinition(MongoDBUserCredentials.class);
 		userCredentialsBuilder.addConstructorArgValue(StringUtils.hasText(username) ? username : null);
 		userCredentialsBuilder.addConstructorArgValue(StringUtils.hasText(password) ? password : null);
+        userCredentialsBuilder.addConstructorArgValue(StringUtils.hasText(authenticationDatabase) ? authenticationDatabase : null);
 
 		return getSourceBeanDefinition(userCredentialsBuilder, context, element);
 	}

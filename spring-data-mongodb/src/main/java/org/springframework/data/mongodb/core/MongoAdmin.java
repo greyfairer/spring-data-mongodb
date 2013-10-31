@@ -15,13 +15,12 @@
  */
 package org.springframework.data.mongodb.core;
 
-import org.springframework.data.authentication.UserCredentials;
+import com.mongodb.DB;
+import com.mongodb.Mongo;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
 import org.springframework.jmx.export.annotation.ManagedOperation;
 import org.springframework.jmx.export.annotation.ManagedResource;
 import org.springframework.util.Assert;
-
-import com.mongodb.DB;
-import com.mongodb.Mongo;
 
 /**
  * Mongo server administration exposed via JMX annotations
@@ -34,6 +33,7 @@ public class MongoAdmin implements MongoAdminOperations {
 	private final Mongo mongo;
 	private String username;
 	private String password;
+    private String authenticationDatabase;
 
 	public MongoAdmin(Mongo mongo) {
 		Assert.notNull(mongo);
@@ -82,7 +82,15 @@ public class MongoAdmin implements MongoAdminOperations {
 		this.password = password;
 	}
 
-	DB getDB(String databaseName) {
-		return MongoDbUtils.getDB(mongo, databaseName, new UserCredentials(username, password));
+    /**
+     * Sets the database to authenticate to.
+     * @param authenticationDatabase The authentication database name
+     */
+    public void setAuthenticationDatabase(String authenticationDatabase) {
+        this.authenticationDatabase = authenticationDatabase;
+    }
+
+    DB getDB(String databaseName) {
+		return MongoDbUtils.getDB(mongo, databaseName, new MongoDBUserCredentials(username, password, authenticationDatabase));
 	}
 }

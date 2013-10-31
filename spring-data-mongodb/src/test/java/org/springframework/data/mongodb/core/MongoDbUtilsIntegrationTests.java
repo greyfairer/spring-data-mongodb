@@ -15,40 +15,41 @@
  */
 package org.springframework.data.mongodb.core;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
+import com.mongodb.DB;
+import com.mongodb.Mongo;
+import com.mongodb.MongoException;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.springframework.dao.DataAccessException;
+import org.springframework.data.mongodb.authentication.MongoDBUserCredentials;
+import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
-import org.junit.Test;
-import org.springframework.dao.DataAccessException;
-import org.springframework.data.authentication.UserCredentials;
-import org.springframework.scheduling.concurrent.ThreadPoolExecutorFactoryBean;
-
-import com.mongodb.DB;
-import com.mongodb.Mongo;
-import com.mongodb.MongoException;
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 /**
  * Integration tests for {@link MongoDbUtils}.
- * 
+ *
  * @author Oliver Gierke
  */
 public class MongoDbUtilsIntegrationTests {
 
 	static final String DATABASE_NAME = "dbAuthTests";
-	static final UserCredentials CREDENTIALS = new UserCredentials("admin", "admin");
-
+    static final String AUTH_DATABASE_NAME = "admin";
+    static final MongoDBUserCredentials CREDENTIALS = new MongoDBUserCredentials("admin", "admin");
+    static final MongoDBUserCredentials CREDENTIALS2 = new MongoDBUserCredentials("admin2", "admin2","admin");
 	static Mongo mongo;
 	static MongoTemplate template;
 	static ThreadPoolExecutorFactoryBean factory;
 	static ExecutorService service;
-
 	Exception exception;
 
 	@BeforeClass
@@ -64,6 +65,14 @@ public class MongoDbUtilsIntegrationTests {
 				return null;
 			}
 		});
+        MongoTemplate template2 = new MongoTemplate(mongo, AUTH_DATABASE_NAME);
+        // Create sample user
+        template2.execute(new DbCallback<Void>() {
+            public Void doInDB(DB db) throws MongoException, DataAccessException {
+                db.addUser("admin2", "admin2".toCharArray());
+                return null;
+            }
+        });
 
 		factory = new ThreadPoolExecutorFactoryBean();
 		factory.setCorePoolSize(2);
@@ -121,4 +130,37 @@ public class MongoDbUtilsIntegrationTests {
 			fail("Exception occurred!" + exception);
 		}
 	}
+
+    /**
+     * @see DATAMONGO-789
+     */
+    @Test
+    public void authenticatesCorrectlyWithAuthenticationDB() throws Exception {
+
+        Callable<Void> callable = new Callable<Void>() {
+            public Void call() throws Exception {
+
+                try {
+                    DB db = MongoDbUtils.getDB(mongo, DATABASE_NAME, CREDENTIALS2);
+                    assertThat(db, is(notNullValue()));
+                } catch (Exception o_O) {
+                    MongoDbUtilsIntegrationTests.this.exception = o_O;
+                }
+
+                return null;
+            }
+        };
+
+        List<Callable<Void>> callables = new ArrayList<Callable<Void>>();
+
+        for (int i = 0; i < 10; i++) {
+            callables.add(callable);
+        }
+
+        service.invokeAll(callables);
+
+        if (exception != null) {
+            fail("Exception occurred!" + exception);
+        }
+    }
 }

@@ -38,7 +38,15 @@
 					  username="joe"
 					  password="secret"/>
 
-	<mongo:mongo id="defaultMongo" host="localhost" port="27017"/>
+    <mongo:db-factory id="thirdMongoDbFactory"
+                      host="localhost"
+                      port="27017"
+                      dbname="database"
+                      username="joe"
+                      password="secret"
+                      authenticationDatabase="admin"/>
+
+    <mongo:mongo id="defaultMongo" host="localhost" port="27017"/>
 
 	<mongo:mongo id="mongoSsl" host="localhost" port="27017">
 		<mongo:options ssl="true"/>
